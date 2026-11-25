@@ -58,7 +58,7 @@ jobs:
           echo "SDKROOT=$(xcrun --show-sdk-path)" >> $GITHUB_ENV
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: npm install -g pnpm@10.34.0
 
       - name: Get pnpm store directory
         shell: bash
