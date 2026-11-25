@@ -177,7 +177,7 @@ export function createSessionRoutes(): express.Router {
   });
 
   // ── POST /api/sessions/bindings - 新增绑定
-  router.post('/bindings', (req, res) => {
+  router.post('/bindings', async (req, res) => {
     try {
       const { platform, conversationId, sessionId, title, creatorId, chatType, sessionDirectory } = req.body as CreateBindingRequest;
 
@@ -196,6 +196,15 @@ export function createSessionRoutes(): express.Router {
       const options: SessionBindingOptions = {};
       if (chatType) options.chatType = chatType;
       if (sessionDirectory) options.sessionDirectory = sessionDirectory;
+
+      try {
+        const targetSession = await opencodeClient.findSessionAcrossProjects(sessionId);
+        if (targetSession?.directory) {
+          options.resolvedDirectory = targetSession.directory;
+        }
+      } catch (error) {
+        console.warn('[Session API] 获取 Session 目录失败，将继续创建绑定:', error instanceof Error ? error.message : error);
+      }
 
       chatSessionStore.setSessionByConversation(
         platform,
